@@ -1,0 +1,13 @@
+{
+	"id" : "varuna3",
+	"name" : "Varuna 3",
+	"description" : "Ce plugin, en cohabitation avec le plugin EIB / KNX, vas gérer votre central Varuna 3",
+	"licence" : "AGPL",
+	"author" : "Halbout Michael",
+	"require" : "4.0",
+	"category" : "security",
+	"hasOwnDeamon" : true,
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"],
+ 	"documentation" : "https://mika-nt28.github.io/Documentations/varuna3/#language#/",
+	"changelog" : "https://mika-nt28.github.io/Documentations/varuna3/#language#/changelog"
+}
