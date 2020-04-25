@@ -51,10 +51,10 @@ class varuna3 extends eqLogic {
 			$listener->emptyEvent();
 			$KnxEqLogic = eibd::AddEquipement("Varuna 3","");
 			for($secondaire = 0;$secondaire<76;$secondaire++){
-					config::byKey('EmissionPrincipal','varuna3');
-					config::byKey('EmissionMedian','varuna3');
-					config::byKey('RetourPrincipal','varuna3');
-					config::byKey('RetourMedian','varuna3');
+				//config::byKey('EmissionPrincipal','varuna3');
+				//config::byKey('EmissionMedian','varuna3');
+				//config::byKey('RetourPrincipal','varuna3');
+				//config::byKey('RetourMedian','varuna3');
 				$_logicalId=config::byKey('InterogationPrincipal','varuna3').'/'.config::byKey('InterogationMedian','varuna3')."/".$secondaire;
 				if($secondaire < 1){
 					$Groupe= "Etat groupes de surveillance";
@@ -68,7 +68,7 @@ class varuna3 extends eqLogic {
 					}
 				}elseif($secondaire < 7){
 					$Groupe= "Etat des sorties universelles";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " " .($secondaire*8)-7." - ".$secondaire*8,'',"info", '5.xxx');
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $secondaire*8-7 ." - ".$secondaire*8 ."]",'',"info", '5.xxx');
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe);
 					for($loop = 0;$loop<8;$loop++){
@@ -191,7 +191,7 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 		return $Commande;
 	}
 	private function DecodeState($value,$bit) {
-		return $value >> $bit & 0x01
+		return $value >> $bit & 0x01;
 	}
 }
 class varuna3Cmd extends cmd {
