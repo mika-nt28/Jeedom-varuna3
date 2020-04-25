@@ -24,13 +24,23 @@ class varuna3 extends eqLogic {
 		if(is_object($listener))
 			$listener->remove();			
 	}
-	public static function TransmitValue($_options) {
+	public static function pull($_options) {
 		$Event = cmd::byId($_options['event_id']);
 		if(!is_object($Event)){
 			log::add('varuna3','error','Impossible de touvée l\'objet '.$_options['event_id']);
 			return;
 		}
 		log::add('varuna3','info',$Event->getHumanName().' est mise a jour: '.$_options['value']);
+		switch($Event->getConfiguration('decodage')){
+			case 'bitToState':
+				for($bit = 0;$bit<8;$bit++){
+					$Commande = cmd::byLogicalId($Event->getId().'_'.$bit);
+					if(is_object($Commande)){
+						$Commande->event($Event->DecodeState($_options['value'],$bit));
+					}
+				}
+			break;
+		}
 	}
 	private static function CreateListener(){
 		$listener = listener::byClassAndFunction('varuna3', 'pull');
@@ -41,7 +51,11 @@ class varuna3 extends eqLogic {
 			$listener->emptyEvent();
 			$KnxEqLogic = eibd::AddEquipement("Varuna 3","");
 			for($secondaire = 0;$secondaire<76;$secondaire++){
-				$_logicalId="7/0/".$secondaire;
+					config::byKey('EmissionPrincipal','varuna3');
+					config::byKey('EmissionMedian','varuna3');
+					config::byKey('RetourPrincipal','varuna3');
+					config::byKey('RetourMedian','varuna3');
+				$_logicalId=config::byKey('InterogationPrincipal','varuna3').'/'.config::byKey('InterogationMedian','varuna3')."/".$secondaire;
 				if($secondaire < 1){
 					$Groupe= "Etat groupes de surveillance";
 					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,'',"info", '5.xxx');
@@ -50,7 +64,7 @@ class varuna3 extends eqLogic {
 					for($loop = 0;$loop<8;$loop++){
 						$Name = $Groupe." ".$loop+1;
 						$LogicalId = $KnxCmd->getId().'_'.$Loop;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary','bitToState');
 					}
 				}elseif($secondaire < 7){
 					$Groupe= "Etat des sorties universelles";
@@ -60,7 +74,7 @@ class varuna3 extends eqLogic {
 					for($loop = 0;$loop<8;$loop++){
 						$Name = $Groupe." ".($secondaire*8)-$loop+1;
 						$LogicalId = $KnxCmd->getId().'_'.$Loop;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary','bitToState');
 					}
 				}
 				
@@ -160,7 +174,7 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 		$Equipement->save();
 		return $Equipement;
 	}
-	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='binary') {
+	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='binary',$Decodage='') {
 		$Commande = $this->getCmd(null,$_logicalId);
 		if (!is_object($Commande)){
 			$Commande = new varuna3Cmd();
@@ -171,6 +185,7 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 			$Commande->setEqLogic_id($this->getId());
 			$Commande->setType($Type);
 			$Commande->setSubType($SubType);
+			$Commande->setconfiguration('decodage',$Decodage);
 			$Commande->save();
 		}
 		return $Commande;
