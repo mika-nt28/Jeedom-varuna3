@@ -43,18 +43,27 @@ class varuna3 extends eqLogic {
 			for($secondaire = 0;$secondaire<76;$secondaire++){
 				$_logicalId="7/0/".$secondaire;
 				if($secondaire < 1){
-					$Name= "Etat groupes de surveillance";
-					$Eqlogic = self::AddEquipement($Name);
+					$Groupe= "Etat groupes de surveillance";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,'',"info", '5.xxx');
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe);
+					for($loop = 0;$loop<8;$loop++){
+						$Name = $Groupe." ".$loop+1;
+						$LogicalId = $KnxCmd->getId().'_'.$Loop;
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
+					}
 				}elseif($secondaire < 7){
-					$Name= "Etat des sorties universelles";
-					$Eqlogic = self::AddEquipement($Name);
-					$Name .= " " .($secondaire*8)-7."".$secondaire*8;
+					$Groupe= "Etat des sorties universelles";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " " .($secondaire*8)-7." - ".$secondaire*8,'',"info", '5.xxx');
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe);
+					for($loop = 0;$loop<8;$loop++){
+						$Name = $Groupe." ".($secondaire*8)-$loop+1;
+						$LogicalId = $KnxCmd->getId().'_'.$Loop;
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
+					}
 				}
-				$KnxCmd = $KnxEqLogic->AddCommande($Name,$_logicalId,"info", '5.xxx') 
-				$listener->addEvent($KnxCmd->getId());
-				for($loop = 0;$loop<8;$loop++){
-					$Eqlogic->AddCommande($Name.$loop,$loop,"info",'binary');
-				}
+				
 /*
 
 007 : état des sorties chauffages des zones 1 à 8
