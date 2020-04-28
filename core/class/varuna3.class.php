@@ -60,7 +60,7 @@ class varuna3 extends eqLogic {
 					$Groupe= "Etat groupes de surveillance";
 					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,'',"info", '5.xxx');
 					$listener->addEvent($KnxCmd->getId());
-					$Eqlogic = self::AddEquipement($Groupe);
+					$Eqlogic = self::AddEquipement($Groupe,'groupe');
 					for($loop = 0;$loop<8;$loop++){
 						$Name = $Groupe." ".$loop+1;
 						$LogicalId = $KnxCmd->getId().'_'.$Loop;
@@ -70,7 +70,7 @@ class varuna3 extends eqLogic {
 					$Groupe= "Etat des sorties universelles";
 					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $secondaire*8-7 ." - ".$secondaire*8 ."]",'',"info", '5.xxx');
 					$listener->addEvent($KnxCmd->getId());
-					$Eqlogic = self::AddEquipement($Groupe);
+					$Eqlogic = self::AddEquipement($Groupe,'universelles');
 					for($loop = 0;$loop<8;$loop++){
 						$Name = $Groupe." ".($secondaire*8)-$loop+1;
 						$LogicalId = $KnxCmd->getId().'_'.$Loop;
@@ -160,10 +160,9 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 		}
 	}
 	public static function AddEquipement($Name,$_logicalId,$_objectId=null) {
-		foreach(eqLogic::byType('varuna3') as $Equipement){
-			if($Equipement->getName() == $Name && $Equipement->getObject_id() == $_objectId)
-				return $Equipement;
-		}
+		$Equipement = eqLogic::byLogicalId($_logicalId,'varuna3');
+		if(is_object($Equipement))
+			return $Equipement;
 		$Equipement = new varuna3();
 		$Equipement->setName($Name);
 		$Equipement->setLogicalId($_logicalId);
