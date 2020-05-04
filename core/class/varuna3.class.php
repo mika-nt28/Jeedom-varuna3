@@ -49,7 +49,11 @@ class varuna3 extends eqLogic {
 			$listener->setClass('varuna3');
 			$listener->setFunction('pull');
 			$listener->emptyEvent();
-			$KnxEqLogic = eibd::AddEquipement("Varuna 3","");
+			$KnxEqLogic = cache::byKey('varuna3::KnxId');
+			if($KnxEqLogic->getValue(null) != null)
+				$KnxEqLogic = eqLogic::byId($KnxEqLogic->getValue(null));
+			if(!is_object($KnxEqLogic)
+				$KnxEqLogic = eibd::AddEquipement("Varuna 3","");
 			for($secondaire = 0;$secondaire<76;$secondaire++){
 				//config::byKey('EmissionPrincipal','varuna3');
 				//config::byKey('EmissionMedian','varuna3');
