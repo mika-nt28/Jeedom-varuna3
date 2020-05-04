@@ -58,22 +58,26 @@ class varuna3 extends eqLogic {
 				$_logicalId=config::byKey('InterogationPrincipal','varuna3').'/'.config::byKey('InterogationMedian','varuna3')."/".$secondaire;
 				if($secondaire < 1){
 					$Groupe= "Etat groupes de surveillance";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,'',"info", '5.xxx');
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx');
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'groupe');
-					for($loop = 0;$loop<8;$loop++){
-						$Name = $Groupe." ".$loop+1;
-						$LogicalId = $KnxCmd->getId().'_'.$Loop;
+					for($Bit = 0; $Bit < 8; $Bit++){
+						$Etat = $Bit+1;
+						$Name = $Groupe . " " . $Etat;
+						$LogicalId = $KnxCmd->getId().'_'.$Bit;
 						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary','bitToState');
 					}
 				}elseif($secondaire < 7){
 					$Groupe= "Etat des sorties universelles";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $secondaire*8-7 ." - ".$secondaire*8 ."]",'',"info", '5.xxx');
+					$Debut = $secondaire * 8 - 7;
+					$Fin = $secondaire * 8;
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$_logicalId,"info", '5.xxx');
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'universelles');
-					for($loop = 0;$loop<8;$loop++){
-						$Name = $Groupe." ".($secondaire*8)-$loop+1;
-						$LogicalId = $KnxCmd->getId().'_'.$Loop;
+					for($Bit = 0; $Bit < 8; $Bit++){
+						$Etat =  $Debut + $Bit;
+						$Name = $Groupe . " " . $Etat;
+						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
 						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary','bitToState');
 					}
 				}
@@ -159,14 +163,14 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 			$listener->save();
 		}
 	}
-	public static function AddEquipement($Name,$_logicalId,$_objectId=null) {
+	public static function AddEquipement($Name,$_logicalId) {
 		$Equipement = eqLogic::byLogicalId($_logicalId,'varuna3');
 		if(is_object($Equipement))
 			return $Equipement;
 		$Equipement = new varuna3();
 		$Equipement->setName($Name);
 		$Equipement->setLogicalId($_logicalId);
-		$Equipement->setObject_id($_objectId);
+		$Equipement->setObject_id(null);
 		$Equipement->setEqType_name('varuna3');
 		$Equipement->setIsEnable(1);
 		$Equipement->setIsVisible(1);
@@ -175,18 +179,18 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='binary',$Decodage='') {
 		$Commande = $this->getCmd(null,$_logicalId);
-		if (!is_object($Commande)){
-			$Commande = new varuna3Cmd();
-			$Commande->setId(null);
-			$Commande->setName($Name);
-			$Commande->setIsVisible(1);
-			$Commande->setLogicalId($_logicalId);
-			$Commande->setEqLogic_id($this->getId());
-			$Commande->setType($Type);
-			$Commande->setSubType($SubType);
-			$Commande->setconfiguration('decodage',$Decodage);
-			$Commande->save();
-		}
+		if(is_object($Commande))
+			return $Commande;
+		$Commande = new varuna3Cmd();
+		$Commande->setId(null);
+		$Commande->setName($Name);
+		$Commande->setIsVisible(1);
+		$Commande->setLogicalId($_logicalId);
+		$Commande->setEqLogic_id($this->getId());
+		$Commande->setType($Type);
+		$Commande->setSubType($SubType);
+		$Commande->setconfiguration('decodage',$Decodage);
+		$Commande->save();
 		return $Commande;
 	}
 	private function DecodeState($value,$bit) {
