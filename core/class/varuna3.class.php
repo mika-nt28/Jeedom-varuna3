@@ -36,7 +36,9 @@ class varuna3 extends eqLogic {
 				for($bit = 0;$bit<8;$bit++){
 					$Commande = cmd::byLogicalId($Event->getId().'_'.$bit);
 					if(is_object($Commande)){
-						$Commande->event($Event->DecodeState($_options['value'],$bit));
+						$value = $Event->DecodeState($_options['value'],$bit);
+						log::add('varuna3','debug', $Commande->getHumanName().' est mise a jour: '.$value);
+						$Commande->event($value);
 					}
 				}
 			break;
