@@ -203,7 +203,7 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 		return $Commande;
 	}
 	private function DecodeState($value,$bit) {
-		return $value >> $bit & 0x01;
+		return ($value >> $bit) & 0x01;
 	}
 }
 class varuna3Cmd extends cmd {
