@@ -54,7 +54,7 @@ class varuna3 extends eqLogic {
 			$KnxEqLogic = cache::byKey('varuna3::KnxId');
 			if($KnxEqLogic->getValue(null) != null)
 				$KnxEqLogic = eqLogic::byId($KnxEqLogic->getValue(null));
-			if(!is_object($KnxEqLogic){
+			if(!is_object($KnxEqLogic)){
 				$KnxEqLogic = eibd::AddEquipement("Varuna 3","");
 				cache::set('varuna3::KnxId', $KnxEqLogic->getId(), 0);
 			}
