@@ -15,7 +15,7 @@ class varuna3 extends eqLogic {
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != 'ok') 
 			return;
-		log::remove('varuna3');
+		//log::remove('varuna3');
 		self::deamon_stop();
 		self::CreateListener();
 	}
@@ -52,9 +52,10 @@ class varuna3 extends eqLogic {
 			$listener->setFunction('pull');
 			$listener->emptyEvent();
 			$KnxEqLogic = cache::byKey('varuna3::KnxId');
-			if($KnxEqLogic->getValue(null) != null)
+			if(is_object($KnxEqLogic) && $KnxEqLogic->getValue(null) != null){
 				$KnxEqLogic = eqLogic::byId($KnxEqLogic->getValue(null));
-			if(!is_object($KnxEqLogic)){
+            		}
+			if(!is_object($KnxEqLogic) || $KnxEqLogic->getValue(null) == null){
 				$KnxEqLogic = eibd::AddEquipement("Varuna 3","");
 				cache::set('varuna3::KnxId', $KnxEqLogic->getId(), 0);
 			}
