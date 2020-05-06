@@ -75,20 +75,20 @@ class varuna3 extends eqLogic {
 				$_logicalId=config::byKey('InterogationPrincipal','varuna3').'/'.config::byKey('InterogationMedian','varuna3')."/".$secondaire;
 				if($secondaire < 1){
 					$Groupe= "Etat groupes de surveillance";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1");
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'groupe');
 					for($Bit = 0; $Bit < 8; $Bit++){
 						$Etat = $Bit+1;
 						$Name = $Groupe . " " . $Etat;
 						$LogicalId = $KnxCmd->getId().'_'.$Bit;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary'));
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
 					}
 				}elseif($secondaire < 7){
 					$Groupe= "Etat des sorties universelles";
 					$Debut = $secondaire * 8 - 7;
 					$Fin = $secondaire * 8;
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1");
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'universelles');
 					for($Bit = 0; $Bit < 8; $Bit++){
