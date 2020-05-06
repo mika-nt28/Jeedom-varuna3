@@ -99,7 +99,7 @@ class varuna3 extends eqLogic {
 					}
 				}elseif($secondaire < 8){
 					$Groupe= "Etat des sorties chauffages";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe",$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'chauffages');
 					for($Bit = 0; $Bit < 8; $Bit++){
