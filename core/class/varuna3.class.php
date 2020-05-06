@@ -32,7 +32,7 @@ class varuna3 extends eqLogic {
 		}
 		log::add('varuna3','info',$Event->getHumanName().' est mise a jour: '.$_options['value']);
 		$Gad = explode('/',$Event->getLogicalId());
-		if($Gad[2] < 7){
+		if($Gad[2] < 9){
 			for($Bit = 0;$Bit<8;$Bit++){
 				$LogicalId = $Event->getId().'_' . (8 - $Bit);
 				$Commande = cmd::byLogicalId($LogicalId,'varuna3');
@@ -97,12 +97,31 @@ class varuna3 extends eqLogic {
 						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
 						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
 					}
+				}elseif($secondaire < 8){
+					$Groupe= "Etat des sorties chauffages";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe",$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'chauffages');
+					for($Bit = 0; $Bit < 8; $Bit++){
+						$Etat =  1 + $Bit;
+						$Name = $Groupe . " " . $Etat;
+						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
+					}
+				}elseif($secondaire < 9){
+					$Groupe= "Etat des sorties climatisations";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'climatisations');
+					for($Bit = 0; $Bit < 8; $Bit++){
+						$Etat =  1 + $Bit;
+						$Name = $Groupe . " " . $Etat;
+						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
+						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
+					}
 				}
 				
 /*
-
-007 : état des sorties chauffages des zones 1 à 8
-008 : état des sorties climatisations des zones 1 à 8
 009 : état des sorties cumulus 1 à 4 et du mode d’énergie (hiver (bit 5), été (bit 6), hors-gel (bit 7))
 010 : état des sorties gâche des groupes 1 à 8
 011 : état des entrées d’automatisme / surveillance technique 1 à 8
