@@ -34,19 +34,21 @@ class varuna3 extends eqLogic {
 		$Gad = explode('/',$Event->getLogicalId());
 		if($Gad[2] < 9){
 			for($Bit = 0;$Bit<8;$Bit++){
-				$LogicalId = $Event->getId().'_' . (8 - $Bit);
-				$Commande = cmd::byLogicalId($LogicalId,'varuna3');
-				if(is_object($Commande)){
-					$_value = $Commande->DecodeState($_options['value'],$Bit);
-					log::add('varuna3','debug', $Commande->getHumanName().' est mise a jour: '.$_value);					
-					$oldValue = $Commande->execCmd();
-					if ($oldValue !== $Commande->formatValue($_value) || $oldValue === '') {
-						$Commande->event($_value);
-						continue;
-					}
-					if ($Commande->getConfiguration('repeatEventManagement', 'auto') == 'always') {
-						$Commande->event($_value);
-						continue;
+				$LogicalId = $Event->getId().'_' . (7 - $Bit);
+				$Commandes = cmd::byLogicalId($LogicalId);
+				foreach($Commandes as $Commande){
+					if(is_object($Commande)){
+						$_value = $Commande->DecodeState($_options['value'],$Bit);
+						log::add('varuna3','debug', $Commande->getHumanName().' est mise a jour: '.$_value);					
+						$oldValue = $Commande->execCmd();
+						if ($oldValue !== $Commande->formatValue($_value) || $oldValue === '') {
+							$Commande->event($_value);
+							continue;
+						}
+						if ($Commande->getConfiguration('repeatEventManagement', 'auto') == 'always') {
+							$Commande->event($_value);
+							continue;
+						}
 					}
 				}
 			}
@@ -228,12 +230,12 @@ LISTE DES ADRESSES SECONDAIRES (implicites) :
 		$Commande->save();
 		return $Commande;
 	}
-	private function DecodeState($value,$bit) {
-		return ($value >> $bit) & 0x01;
-	}
 }
 class varuna3Cmd extends cmd {
-    public function execute($_options = null) {	
+	public function DecodeState($value,$bit) {
+		return ($value >> $bit) & 0x01;
+	}
+	public function execute($_options = null) {	
 	}
 }
 ?>
