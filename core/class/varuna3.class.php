@@ -54,6 +54,13 @@ class varuna3 extends eqLogic {
 			}
 		}
 	}
+	private function CreateBitCmd($KnxCmdId,$Groupe,$Debut,$Fin=8){
+		for($Bit = 0; $Bit < $Fin; $Bit++){
+			$Name = $Groupe . " " . ($Debut + $Bit);
+			$LogicalId = $KnxCmdId . '_' . $Bit;
+			$this->AddCommande($Name,$LogicalId,"info",'binary');
+		}
+	}
 	private static function CreateListener(){
 		$listener = listener::byClassAndFunction('varuna3', 'pull');
 		if (!is_object($listener)){
@@ -70,83 +77,142 @@ class varuna3 extends eqLogic {
 				cache::set('varuna3::KnxId', $KnxEqLogic->getId(), 0);
 			}
 			for($secondaire = 0;$secondaire<76;$secondaire++){
-				//config::byKey('EmissionPrincipal','varuna3');
-				//config::byKey('EmissionMedian','varuna3');
-				//config::byKey('RetourPrincipal','varuna3');
-				//config::byKey('RetourMedian','varuna3');
-				$_logicalId=config::byKey('InterogationPrincipal','varuna3').'/'.config::byKey('InterogationMedian','varuna3')."/".$secondaire;
+				$GadInterogation=config::byKey('InterogationPrincipal','varuna3').'/'.config::byKey('InterogationMedian','varuna3')."/".$secondaire;
+				$GadEmission=config::byKey('EmissionPrincipal','varuna3').'/'.config::byKey('EmissionMedian','varuna3')."/".$secondaire;
+				$GadRetour=config::byKey('RetourPrincipal','varuna3').'/'.config::byKey('RetourMedian','varuna3')."/".$secondaire;
 				if($secondaire < 1){
 					$Groupe= "Etat groupes de surveillance";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'groupe');
-					for($Bit = 0; $Bit < 8; $Bit++){
-						$Etat = $Bit+1;
-						$Name = $Groupe . " " . $Etat;
-						$LogicalId = $KnxCmd->getId().'_'.$Bit;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
-					}
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
 				}elseif($secondaire < 7){
 					$Groupe= "Etat des sorties universelles";
 					$Debut = $secondaire * 8 - 7;
 					$Fin = $secondaire * 8;
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
 					$Eqlogic = self::AddEquipement($Groupe,'universelles');
-					for($Bit = 0; $Bit < 8; $Bit++){
-						$Etat =  $Debut + $Bit;
-						$Name = $Groupe . " " . $Etat;
-						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
-					}
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,$Debut);
 				}elseif($secondaire < 8){
 					$Groupe= "Etat des sorties chauffages";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
-					$Eqlogic = self::AddEquipement($Groupe,'chauffages');
-					for($Bit = 0; $Bit < 8; $Bit++){
-						$Etat =  1 + $Bit;
-						$Name = $Groupe . " " . $Etat;
-						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
-					}
+					$Eqlogic = self::AddEquipement($Groupe,'chauffages');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
 				}elseif($secondaire < 9){
 					$Groupe= "Etat des sorties climatisations";
-					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$_logicalId,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
 					$listener->addEvent($KnxCmd->getId());
-					$Eqlogic = self::AddEquipement($Groupe,'climatisations');
-					for($Bit = 0; $Bit < 8; $Bit++){
-						$Etat =  1 + $Bit;
-						$Name = $Groupe . " " . $Etat;
-						$LogicalId = $KnxCmd->getId() . '_' . $Bit;
-						$Eqlogic->AddCommande($Name,$LogicalId,"info",'binary');
-					}
+					$Eqlogic = self::AddEquipement($Groupe,'climatisations');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 10){
+					$Groupe= "Etat des sorties cumulus";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'cumulus');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1,4);
+					$Eqlogic->AddCommande('Hivers',$KnxCmd->getId() . '_5',"info",'binary');
+					$Eqlogic->AddCommande('Eté',$KnxCmd->getId() . '_6',"info",'binary');
+					$Eqlogic->AddCommande('Hors-gel',$KnxCmd->getId() . '_7',"info",'binary');
+				}elseif($secondaire < 11){
+					$Groupe= "Etat des sorties gâche des groupes";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'gache');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 15){
+					$Groupe= "Etat des entrées d’automatisme / surveillance technique";
+					$Debut = $secondaire * 8 - 15 * 7;
+					$Fin = $Debut + 8;
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'automatisme');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 19){
+					$Groupe= "Etat boucles de surveillance";
+					$Debut = $secondaire * 8 - 14 * 7;
+					$Fin = $Debut + 8;
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'surveillance');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 23){
+					$Groupe= "Etat d’auto protection";
+					$Debut = $secondaire * 8 - 22 * 7;
+					$Fin = $Debut + 8;
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe. " [" . $Debut . " - " .$Fin. "]",$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'auto-protection');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 24){
+					$Groupe= "Etat d’auto protection de la centrale";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'auto-protection_centrale');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1,1);
+				}elseif($secondaire < 25){
+					$Groupe= "Etat d’auto protection des Unités Déportées";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'auto-protection_UD');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 26){
+					$Groupe= "Etat cellule crépusculaire";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'crépusculaire');
+					$Eqlogic->AddCommande('Seuil 1',$KnxCmd->getId() . '_1',"info",'binary');
+					$Eqlogic->AddCommande('Seuil 2',$KnxCmd->getId() . '_0',"info",'binary');;
+				}elseif($secondaire < 27){
+					$Groupe= "Alarme";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'alarme');
+					$Eqlogic->AddCommande('Technique 1 à 8',$KnxCmd->getId() . '_0',"info",'binary');
+					$Eqlogic->AddCommande('Technique 9 à 16',$KnxCmd->getId() . '_1',"info",'binary');
+					$Eqlogic->AddCommande('Technique 17 à 24',$KnxCmd->getId() . '_2',"info",'binary');
+					$Eqlogic->AddCommande('Technique 25 à 32',$KnxCmd->getId() . '_3',"info",'binary');
+					$Eqlogic->AddCommande('Seuil température',$KnxCmd->getId() . '_5',"info",'binary');
+					$Eqlogic->AddCommande('SOS',$KnxCmd->getId() . '_6',"info",'binary');
+					$Eqlogic->AddCommande('Secteur',$KnxCmd->getId() . '_7',"info",'binary');
+				}elseif($secondaire < 28){
+					$Groupe= "Presence alarme groupe";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'presence_groupe');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 29){
+					$Groupe= "Energie";
+					$KnxCmd = $KnxEqLogic->AddCommande("Mode ".$Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'presence_groupe');
+					//$Eqlogic->AddCommande('Mode',$KnxCmd->getId(),"info",'binary');
+					//028 : Etat mode d’énergie (01 : mode hiver, 10 : mode été, 11 : mode hors-gel)
+				}elseif($secondaire < 30){
+					//029 : présence tarif EDF (bits 7 et 6), au moins une al. (bit 3), présence du secteur (bit 0)
+				}elseif($secondaire < 31){
+					$Groupe= "Energie";
+					$KnxCmd = $KnxEqLogic->AddCommande("Mode ".$Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'presence_groupe');
+					//$Eqlogic->AddCommande('Mode',$KnxCmd->getId(),"info",'binary');
+					//028 : Etat mode d’énergie (01 : mode hiver, 10 : mode été, 11 : mode hors-gel)
+				}elseif($secondaire < 32){
+					$Groupe= "Etat anti-gaspi";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'anti-gaspi');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
+				}elseif($secondaire < 33){
+					$Groupe= "Delestage";
+					$KnxCmd = $KnxEqLogic->AddCommande($Groupe,$GadInterogation,"info", '5.xxx',array("FlagInit"=>"1","FlagRead"=>"0","FlagTransmit"=>"0","FlagUpdate"=>"1","FlagWrite"=>"1"));
+					$listener->addEvent($KnxCmd->getId());
+					$Eqlogic = self::AddEquipement($Groupe,'Delestage');					
+					$Eqlogic->CreateBitCmd($KnxCmd->getId(),$Groupe,1);
 				}
 				
 /*
-009 : état des sorties cumulus 1 à 4 et du mode d’énergie (hiver (bit 5), été (bit 6), hors-gel (bit 7))
-010 : état des sorties gâche des groupes 1 à 8
-011 : état des entrées d’automatisme / surveillance technique 1 à 8
-012 : état des entrées d’automatisme / surveillance technique 9 à 16
-013 : état des entrées d’automatisme / surveillance technique 17 à 24
-014 : état des entrées d’automatisme / surveillance technique 25 à 32
-015 : état des boucles de surveillance (détecteur) 1 à 8
-016 : état des boucles de surveillance (détecteur) 9 à 16
-017 : état des boucles de surveillance (détecteur) 17 à 24
-018 : état des boucles de surveillance (détecteur) 25 à 32
-019 : état des boucles d’auto protection 1 à 8
-020 : état des boucles d’auto protection 9 à 16
-021 : état des boucles d’auto protection 17 à 24
-022 : état des boucles d’auto protection 25 à 32
-023 : état de la boucle d’auto protection de la centrale (sur bit 0)
-024 : état des boucles d’auto protection des Unités Déportées 1 à 8
-025 : état des 2 seuils de la cellule crépusculaire (seuil 1 sur bit 1, seuil 2 sur bit 0)
-026 : al. secteur (bit 7), al. SOS (bit 6), al. seuils températures (bit 5), al. technique 25 à 32 (bit 3), al. tech. 17 à 24 (bit 2), al. tech. 9 à 16 (bit 1), al. tech. 1 à 8 (bit 0)
-027 : présence alarme groupe 1 à 8
-028 : Etat mode d’énergie (01 : mode hiver, 10 : mode été, 11 : mode hors-gel)
-029 : présence tarif EDF (bits 7 et 6), au moins une al. (bit 3), présence du secteur (bit 0)
-030 : état anti-gaspi des 8 zones de chauffage / climatisation (bits à 1 : en anti-gaspi)
-031 : état délesté des 8 zones de chauffage / climatisation (bits à 1 : délestée)
 
 LISTE DES ADRESSES SECONDAIRES (implicites) dont la data utile est sur 3 octets :
 032 : index du compteur N°1 (PF sur 1er octet utile de data, pf sur 3ème octet utile de data)
