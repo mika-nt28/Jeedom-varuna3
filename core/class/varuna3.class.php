@@ -5,10 +5,12 @@ class varuna3 extends eqLogic {
 		$return = array();
 		$return['log'] = 'eibd';	
 		$return['launchable'] = 'ok';
-		$return['state'] = 'nok';		
-		$listener = listener::byClassAndFunction('varuna3', 'pull');
-		if(is_object($listener))
-			$return['state'] = 'ok';	
+		$return['state'] = 'nok';	
+		if(config::byKey('protocol','varuna3') == 'knx'){
+			$listener = listener::byClassAndFunction('varuna3', 'pull');
+			if(is_object($listener))
+				$return['state'] = 'ok';	
+		}
 		return $return;
 	}
 	public static function deamon_start($_debug = false) {
@@ -17,12 +19,15 @@ class varuna3 extends eqLogic {
 			return;
 		//log::remove('varuna3');
 		self::deamon_stop();
-		self::CreateListener();
+		if(config::byKey('protocol','varuna3') == 'knx')
+			self::CreateKNXListener();
 	}
 	public static function deamon_stop() {
 		$listener = listener::byClassAndFunction('varuna3', 'pull');
-		if(is_object($listener))
-			$listener->remove();			
+		if(config::byKey('protocol','varuna3') == 'knx'){
+			if(is_object($listener))
+				$listener->remove();		
+		}
 	}
 	public static function pull($_options) {
 		$Event = cmd::byId($_options['event_id']);
@@ -61,7 +66,7 @@ class varuna3 extends eqLogic {
 			$this->AddCommande($Name,$LogicalId,"info",'binary');
 		}
 	}
-	private static function CreateListener(){
+	private static function CreateKNXListener(){
 		$listener = listener::byClassAndFunction('varuna3', 'pull');
 		if (!is_object($listener)){
 			$listener = new listener();
