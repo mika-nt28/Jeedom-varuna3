@@ -5,7 +5,6 @@
 	$plugin = plugin::byId('varuna3');
 	sendVarToJS('eqType', $plugin->getId());
 	$eqLogics = eqLogic::byType($plugin->getId());
-	$ambiances=ls(dirname(__FILE__) . '/../../core/config/ambiance', '*');
 ?>
 
 <div class="row row-overflow">    
@@ -82,18 +81,18 @@
 							<div class="form-group ">
 								<label class="col-sm-2 control-label">{{Nom}}
 									<sup>
-										<i class="fa fa-question-circle tooltips" title="Indiquer le nom de votre réveil"></i>
+										<i class="fa fa-question-circle tooltips" title="Indiquer le nom de votre equipmeent"></i>
 									</sup>
 								</label>
 								<div class="col-sm-5">
 									<input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
-									<input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom du groupe de zones}}"/>
+									<input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom du groupe de votre equipement}}"/>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-2 control-label" >{{Objet parent}}
 									<sup>
-										<i class="fa fa-question-circle tooltips" title="Indiquer l'objet dans lequel le widget de ce réveil apparaîtra sur le dashboard"></i>
+										<i class="fa fa-question-circle tooltips" title="Indiquer l'objet dans lequel le widget apparaîtra sur le dashboard"></i>
 									</sup>
 								</label>
 								<div class="col-sm-5">
